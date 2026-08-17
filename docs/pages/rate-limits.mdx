@@ -1,0 +1,30 @@
+---
+title: Rate limits
+subtitle: 50 requests per minute, per key.
+---
+
+Each API key may make up to **50 requests per minute**, measured as a sliding
+window. The limit is per key, so separate keys have separate budgets.
+
+When you exceed it, the API responds with `429` and tells you how long to wait:
+
+```json title="429 Too Many Requests"
+Retry-After: 37
+X-RateLimit-Limit: 50
+X-RateLimit-Remaining: 0
+
+{
+  "success": false,
+  "error": {
+    "code": "RATE_LIMITED",
+    "message": "Rate limit exceeded. You can make up to 50 requests per minute.",
+    "retryAfterSeconds": 37
+  }
+}
+```
+
+Read the `Retry-After` header and back off for that many seconds before retrying.
+
+<Note>
+Need a higher ceiling? Contact [support@jsflabs.io](mailto:support@jsflabs.io).
+</Note>

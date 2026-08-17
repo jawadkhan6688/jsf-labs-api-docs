@@ -1,0 +1,42 @@
+---
+title: Quickstart
+subtitle: Clone a voice, then speak with it — two calls, start to finish.
+---
+
+## 1 — Clone a voice from a sample
+
+Upload a clean 10–30 second recording. You get back a permanent, reusable `jsf_`
+voice ID.
+
+```bash title="cURL"
+curl -X POST https://www.jsflabs.io/api/v1/voice-clone \
+  -H "x-api-key: jsf_your_api_key" \
+  -F "audio=@sample.wav" \
+  -F "name=Morgan" \
+  -F "gender=Female" \
+  -F "language=en"
+```
+
+<Note>
+Store the returned `voiceId`. It's permanent and reusable — you never need to
+re-upload the sample to speak in this voice again.
+</Note>
+
+## 2 — Speak with the cloned voice
+
+Pass the voice ID with your text. You get back a hosted WAV file, already
+loudness-normalized to -14 LUFS and peak-limited.
+
+```bash title="cURL"
+curl -X POST https://www.jsflabs.io/api/v1/text-to-speech \
+  -H "x-api-key: jsf_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "The quick brown fox jumps over the lazy dog.",
+    "voice_id": "jsf_c3BlZWNoaWZ5X3ZvaWNlX2lk",
+    "speed": 1
+  }'
+```
+
+That's the whole loop. Everything else in these docs is detail on top of these
+two calls.

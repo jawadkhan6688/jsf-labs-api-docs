@@ -1,0 +1,32 @@
+# Where your API lives. Both the docs site and the SDKs read from this one file.
+api:
+  specs:
+    - openapi: ./openapi.yml
+
+# Each group is a set of SDKs you can generate independently.
+# The version numbers below are placeholders — run these once to pin the
+# current versions automatically:
+#   fern add fernapi/fern-typescript-sdk --group ts-sdk
+#   fern add fernapi/fern-python-sdk     --group python-sdk
+groups:
+  ts-sdk:
+    generators:
+      - name: fernapi/fern-typescript-sdk
+        version: 0.x.x
+        output:
+          location: npm
+          package-name: jsflabs
+          token: ${NPM_TOKEN}
+        config:
+          namespaceExport: JsfLabs
+
+  python-sdk:
+    generators:
+      - name: fernapi/fern-python-sdk
+        version: 4.x.x
+        output:
+          location: pypi
+          package-name: jsflabs
+          token: ${PYPI_TOKEN}
+        config:
+          client_class_name: JsfLabs

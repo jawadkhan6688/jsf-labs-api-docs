@@ -1,0 +1,22 @@
+---
+title: Authentication
+subtitle: One secret key, sent in one header.
+---
+
+Every request is authenticated with your secret API key, sent in the `x-api-key`
+header. Keys always begin with `jsf_`. You can find and manage keys in your JSF
+Labs dashboard.
+
+```bash title="Header"
+x-api-key: jsf_your_api_key
+```
+
+<Warning>
+Your key is a secret. Never expose it in client-side code, mobile apps, or public
+repositories — call the API from your server. A leaked key can spend your
+character balance.
+</Warning>
+
+Requests with a missing key, a malformed key, an unknown key, an inactive
+subscription, or an expired key are rejected before any work is done. See
+[Error codes](/error-codes) for the exact responses.

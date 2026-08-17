@@ -1,0 +1,68 @@
+instances:
+  - url: jsf-labs.docs.buildwithfern.com
+
+title: JSF Labs
+
+# ── Logo ──────────────────────────────────────────────
+# Two versions so it looks right in both themes.
+# Replace these two files in docs/assets/ with your real logo.
+logo:
+  light: docs/assets/logo-dark.svg    # used in LIGHT mode (dark-colored logo)
+  dark: docs/assets/logo-white.svg    # used in DARK mode (white logo)
+  height: 26
+  href: https://jsflabs.io
+
+favicon: docs/assets/favicon.png
+
+# ── Colors ────────────────────────────────────────────
+# accent-primary = links, active items, buttons.
+# background     = the page behind everything.
+colors:
+  accent-primary:
+    light: "#0f0f0f"
+    dark: "#ffffff"
+  background:
+    light: "#ffffff"
+    dark: "#0f0f0f"
+
+# ── Top-right buttons ─────────────────────────────────
+navbar-links:
+  - type: minimal
+    text: Support
+    url: mailto:support@jsflabs.io
+  - type: filled
+    text: Get started
+    url: https://jsflabs.io
+
+# ── Top tabs ──────────────────────────────────────────
+tabs:
+  docs:
+    display-name: Docs
+    icon: house
+  api:
+    display-name: API Reference
+    icon: code
+
+# ── Sidebar / structure ───────────────────────────────
+navigation:
+  - tab: docs
+    layout:
+      - section: Get started
+        contents:
+          - page: Introduction
+            path: docs/pages/welcome.mdx
+          - page: Quickstart
+            path: docs/pages/quickstart.mdx
+          - page: Authentication
+            path: docs/pages/authentication.mdx
+      - section: Core concepts
+        contents:
+          - page: Rate limits
+            path: docs/pages/rate-limits.mdx
+          - page: Credits & billing
+            path: docs/pages/credits.mdx
+          - page: Error codes
+            path: docs/pages/errors.mdx
+  - tab: api
+    layout:
+      - api: API Reference

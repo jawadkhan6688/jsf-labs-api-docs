@@ -1,0 +1,40 @@
+---
+title: Credits & billing
+subtitle: Usage is metered in characters.
+---
+
+Your key carries a total allocation and a running used count; the difference is
+your available balance.
+
+- **Text to speech** costs one character per character of `text` in the request.
+- **Cloning** is currently free — it costs zero characters.
+
+Every successful response echoes your balance, so you can track it without a
+separate call:
+
+```json title="credits object"
+"credits": {
+  "cost": 137,        // charged by this request
+  "used": 137,        // total used so far
+  "remaining": 49863, // what's left
+  "total": 50000      // your allocation
+}
+```
+
+<Note>
+If a request would exceed your balance, it's rejected with `402` and
+`INSUFFICIENT_CHARACTERS` before any audio is generated — you're never charged
+for a request you couldn't afford.
+</Note>
+
+## Voice IDs
+
+Cloning returns a portable voice identifier prefixed with `jsf_`. This is the only
+identifier you ever need — pass it straight into text to speech as `voice_id`.
+
+```bash
+jsf_c3BlZWNoaWZ5X3ZvaWNlX2lk
+```
+
+Treat the value as opaque — don't parse or modify it. A value that doesn't start
+with `jsf_`, or that has been altered, is rejected with `INVALID_VOICE_ID`.

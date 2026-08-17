@@ -1,0 +1,35 @@
+---
+title: Give any application a voice
+subtitle: Clone a voice from a single sample, then turn text into studio-mastered speech in that voice — over one simple REST API.
+---
+
+The JSF Labs API exposes two capabilities behind one gateway. You send audio and
+get back a reusable voice; you send text and get back speech in that voice. Both
+endpoints share the same authentication, rate limits, character-based billing, and
+error format — so once you've called one, you already know how to call the other.
+
+<CardGroup cols={2}>
+  <Card title="Clone a voice" icon="microphone" href="/api-reference">
+    Upload a short sample and receive a portable `jsf_` voice ID.
+  </Card>
+  <Card title="Text to speech" icon="waveform" href="/api-reference">
+    Pass that voice ID with your text and receive a hosted, normalized audio file.
+  </Card>
+</CardGroup>
+
+## Everything is synchronous
+
+Each request returns the finished result. There are no jobs to poll and no
+webhooks to configure — call the endpoint, get your result.
+
+## Base URL
+
+All endpoints live under a single versioned base. Requests must be sent over HTTPS.
+
+```bash
+https://www.jsflabs.io/api/v1
+```
+
+<Card title="Ready to build?" icon="rocket" href="/quickstart">
+  Clone a voice and speak with it in two calls — start to finish.
+</Card>

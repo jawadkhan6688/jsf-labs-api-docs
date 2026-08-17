@@ -1,0 +1,67 @@
+---
+title: Error codes
+subtitle: Stable, machine-readable codes you can switch on.
+---
+
+Every response uses the same envelope, so you can branch on one field. Always
+branch on `success`. On failure, `error.code` is a stable string you can match on;
+`error.message` is human-readable and safe to show your users.
+
+```json title="Failure shape"
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Some fields are invalid. Check the fields object for details.",
+    "fields": { "audio": "Unsupported audio format. Please upload a WAV or MP3 file." }
+  }
+}
+```
+
+## Authentication & access
+
+| HTTP | Code | Meaning |
+| --- | --- | --- |
+| 401 | `MISSING_API_KEY` | No `x-api-key` header was sent. |
+| 401 | `INVALID_KEY_FORMAT` | The key doesn't start with `jsf_` or is too short. |
+| 401 | `INVALID_API_KEY` | The key doesn't match any account. |
+| 403 | `SUBSCRIPTION_INACTIVE` | The account's subscription is turned off. |
+| 403 | `KEY_EXPIRED` | The key's expiry date has passed. |
+| 503 | `AUTH_SERVICE_ERROR` | Authentication backend was briefly unavailable. Retry shortly. |
+
+## Request & quota
+
+| HTTP | Code | Meaning |
+| --- | --- | --- |
+| 429 | `RATE_LIMITED` | Over 50 requests/min. Wait for `Retry-After` seconds. |
+| 400 | `INVALID_JSON` | Text-to-speech body wasn't valid JSON. |
+| 400 | `INVALID_CONTENT_TYPE` | Clone body wasn't multipart/form-data. |
+| 422 | `VALIDATION_ERROR` | One or more fields are invalid. See the `fields` object. |
+| 400 | `INVALID_VOICE_ID` | The `voice_id` is not a valid `jsf_` id. |
+| 402 | `INSUFFICIENT_CHARACTERS` | Not enough character balance for this request. |
+
+## Cloning
+
+| HTTP | Code | Meaning |
+| --- | --- | --- |
+| 422 | `AUDIO_REJECTED` | The sample couldn't be processed. Use a clearer 10–30s recording. |
+| 413 | `AUDIO_TOO_LARGE` | The sample exceeds the size limit. Upload something shorter. |
+| 429 | `CLONING_CAPACITY` | The cloning engine is momentarily at capacity. Retry soon. |
+| 503 | `CLONING_SERVICE_DOWN` | The cloning engine is temporarily unavailable. |
+| 502 | `CLONING_FAILED` | Cloning failed unexpectedly. Retry. |
+
+## Text to speech
+
+| HTTP | Code | Meaning |
+| --- | --- | --- |
+| 504 | `GENERATION_TIMEOUT` | Generation took too long. Try shorter text. |
+| 502 | `GENERATION_FAILED` | Generation failed unexpectedly. Retry. |
+| 502 | `AUDIO_SAVE_FAILED` | Audio was generated but couldn't be stored. Retry. |
+
+## Server
+
+| HTTP | Code | Meaning |
+| --- | --- | --- |
+| 500 | `DB_SAVE_FAILED` | The voice was created but the record couldn't be saved. Contact support with the returned reference. |
+| 500 | `INTERNAL_ERROR` | An unexpected server error. Retry, then contact support. |
+| 405 | `METHOD_NOT_ALLOWED` | The endpoint only accepts POST. |

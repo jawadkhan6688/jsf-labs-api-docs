@@ -1,0 +1,183 @@
+openapi: 3.1.0
+
+info:
+  title: JSF Labs API
+  version: "1.0.0"
+  description: |
+    Clone a voice from a single audio sample, then turn text into
+    studio-mastered speech in that voice — over one simple REST API,
+    authenticated with a single key.
+  contact:
+    name: JSF Labs Support
+    email: support@jsflabs.io
+
+servers:
+  - url: https://www.jsflabs.io/api/v1
+    description: Production
+
+# Every request needs the x-api-key header.
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /voice-clone:
+    post:
+      operationId: clone
+      summary: Clone a voice
+      description: |
+        Upload a clean audio sample and receive a reusable `jsf_` voice ID.
+        Send the request as `multipart/form-data`.
+      tags: [Voices]
+      x-fern-sdk-group-name: voices
+      x-fern-sdk-method-name: clone
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [audio, name]
+              properties:
+                audio:
+                  type: string
+                  format: binary
+                  description: Voice sample. WAV or MP3, up to 25 MB. A clean 10–30s recording gives the best clone.
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 80
+                  description: A label for the voice.
+                gender:
+                  type: string
+                  enum: [Male, Female, Neutral, Unspecified]
+                  default: Unspecified
+                language:
+                  type: string
+                  default: en
+                  description: Two-letter ISO 639-1 code, e.g. en, fr, ar.
+      responses:
+        "201":
+          description: Voice cloned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CloneResponse"
+        "401": { $ref: "#/components/responses/Error" }
+        "413": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+
+  /text-to-speech:
+    post:
+      operationId: convert
+      summary: Text to speech
+      description: |
+        Turn text into speech in a cloned voice. Send the request as
+        `application/json`. The response is a hosted, loudness-normalized WAV file.
+      tags: [Speech]
+      x-fern-sdk-group-name: speech
+      x-fern-sdk-method-name: convert
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text, voice_id]
+              properties:
+                text:
+                  type: string
+                  maxLength: 50000
+                  description: The text to speak. Up to 50,000 characters.
+                voice_id:
+                  type: string
+                  description: A jsf_ voice ID returned by the clone endpoint.
+                speed:
+                  type: number
+                  minimum: 0.5
+                  maximum: 2.0
+                  default: 1
+                  description: Playback pace from 0.5 to 2.0. 1 is natural pace.
+      responses:
+        "200":
+          description: Audio generated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TtsResponse"
+        "402": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        "429": { $ref: "#/components/responses/Error" }
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+
+  schemas:
+    Credits:
+      type: object
+      properties:
+        cost:      { type: integer, description: Characters charged by this request. }
+        used:      { type: integer, description: Total characters used so far. }
+        remaining: { type: integer, description: Characters left. }
+        total:     { type: integer, description: Your total allocation. }
+
+    CloneData:
+      type: object
+      properties:
+        voiceId:   { type: string, example: "jsf_c3BlZWNoaWZ5X3ZvaWNlX2lk" }
+        name:      { type: string, example: "Morgan" }
+        language:  { type: string, example: "en" }
+        gender:    { type: string, example: "Female" }
+        provider:  { type: string, example: "speechify" }
+        sampleUrl: { type: string, format: uri }
+        createdAt: { type: string, format: date-time }
+
+    CloneResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string, example: "Your voice has been cloned successfully." }
+        data:    { $ref: "#/components/schemas/CloneData" }
+        credits: { $ref: "#/components/schemas/Credits" }
+
+    TtsData:
+      type: object
+      properties:
+        audio_url:  { type: string, format: uri }
+        voice_id:   { type: string, example: "jsf_c3BlZWNoaWZ5X3ZvaWNlX2lk" }
+        format:     { type: string, example: "wav" }
+        characters: { type: integer, example: 44 }
+        speed:      { type: number, example: 1 }
+
+    TtsResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string, example: "Your audio has been generated successfully." }
+        data:    { $ref: "#/components/schemas/TtsData" }
+        credits: { $ref: "#/components/schemas/Credits" }
+
+    ErrorBody:
+      type: object
+      properties:
+        code:              { type: string, example: "VALIDATION_ERROR" }
+        message:           { type: string }
+        fields:            { type: object, additionalProperties: { type: string } }
+        retryAfterSeconds: { type: integer }
+
+    ErrorResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        error:   { $ref: "#/components/schemas/ErrorBody" }
+
+  responses:
+    Error:
+      description: Error response.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
